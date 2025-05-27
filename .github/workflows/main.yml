@@ -15,7 +15,7 @@ env:
   IMAGE_NAME: healthcare-backend
   # Use the commit SHA as the image tag for unique versions
   IMAGE_TAG: ${{ github.sha }}
-  GCR_HOSTNAME: gcr.io
+  GCR_HOSTNAME: us-central1-artifactregistry.pkg.dev
 
 jobs:
   build-and-deploy:
