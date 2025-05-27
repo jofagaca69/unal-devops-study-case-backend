@@ -1,0 +1,78 @@
+name: CI/CD Healthcare Project
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the 'main' branch
+  pull_request:
+    branches:
+      - main # Trigger on pull requests to 'main'
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # Your GCP Project ID
+  GKE_CLUSTER_NAME: autopilot-cluster-1
+  GKE_CLUSTER_ZONE: us-central1
+  IMAGE_NAME: healthcare-backend
+  # Use the commit SHA as the image tag for unique versions
+  IMAGE_TAG: ${{ github.sha }}
+  GCR_HOSTNAME: gcr.io
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: ./app
+
+      - name: Run Node.js tests (optional)
+        run: npm test
+        working-directory: ./app
+
+      - name: Authenticate to Google Cloud
+        id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker to use gcloud as a credential helper
+        run: gcloud auth configure-docker ${GCR_HOSTNAME}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ./app
+          docker push ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          # Also push with 'latest' tag for convenience, but use SHA for deployments
+          docker tag ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Get GKE credentials
+        run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER_NAME }} --zone ${{ env.GKE_CLUSTER_ZONE }} --project ${{ env.PROJECT_ID }}
+
+      - name: Deploy to GKE
+        run: |
+          # Replace the image tag in the deployment manifest
+          # This command ensures the image is updated with the new tag
+          sed -i "s|image: gcr.io/<YOUR_PROJECT_ID>/my-node-backend:latest|image: ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}|g" kubernetes/deployment.yaml
+
+          # Apply the Kubernetes manifests
+          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f kubernetes/service.yaml
+
+      - name: Check Deployment Status (optional)
+        run: |
+          kubectl rollout status deployment/node-backend-deployment --timeout=300s
+          kubectl get service node-backend-service
