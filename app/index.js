@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 8080; // Use process.env.PORT for containerized apps
 
 app.get("/", (req, res) => {
-  res.send("Hello from Healthcare Node.js Backend on GKE!");
+  res.send("Hello from Healthcare Node.js Backend on GKE! Yos");
 });
 
 app.get("/health", (req, res) => {
