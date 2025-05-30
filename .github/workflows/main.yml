@@ -19,7 +19,8 @@ env:
   GCR_HOSTNAME: us-central1-docker.pkg.dev
 
 jobs:
-  build-and-deploy:
+
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -34,8 +35,45 @@ jobs:
         run: npm install
         working-directory: ./app
 
-      - name: Run Node.js tests (optional)
-        run: npm test
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: ./app
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: ./app
+
+      - name: Run tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+        working-directory: ./app
+
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Node.js dependencies
+        run: npm install
         working-directory: ./app
 
       - name: Authenticate to Google Cloud
