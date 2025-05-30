@@ -17,6 +17,14 @@ export default [
     }
   },
   {
-    ignores: ['node_modules/**', 'dist/**']
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      '*.d.ts',
+      '**/*.spec.ts',      // Archivos de test
+      '**/*.test.ts',      // Archivos de test alternativos
+      '**/test/**',        // Carpetas de test
+      '**/tests/**'        // Carpetas de tests
+    ]
   }
 ];
