@@ -1,9 +1,9 @@
 import pool from '../config/database.js';
 
-export const login = async (email, password) => {
+export const login = async (correo, password) => {
   try {
-    const query = 'SELECT * FROM users WHERE email = $1 AND password = $2';
-    const result = await pool.query(query, [email, password]);
+    const query = 'SELECT * FROM users WHERE correo = $1 AND password = $2';
+    const result = await pool.query(query, [correo, password]);
     
     if (result.rows.length === 0) {
       return { success: false, message: 'Credenciales inválidas' };
@@ -16,10 +16,10 @@ export const login = async (email, password) => {
   }
 };
 
-export const checkEmailExists = async (email) => {
+export const checkEmailExists = async (correo) => {
   try {
-    const query = 'SELECT * FROM users WHERE email = $1';
-    const result = await pool.query(query, [email]);
+    const query = 'SELECT * FROM users WHERE correo = $1';
+    const result = await pool.query(query, [correo]);
     
     return { exists: result.rows.length > 0 };
   } catch (error) {

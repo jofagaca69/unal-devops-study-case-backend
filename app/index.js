@@ -18,8 +18,8 @@ app.get("/health", (req, res) => {
 // Endpoint de login
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const result = await login(email, password);
+    const { correo, password } = req.body;
+    const result = await login(correo, password);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Error en el servidor' });
@@ -29,8 +29,8 @@ app.post("/login", async (req, res) => {
 // Endpoint para verificar email
 app.post("/check-email", async (req, res) => {
   try {
-    const { email } = req.body;
-    const result = await checkEmailExists(email);
+    const { correo } = req.body;
+    const result = await checkEmailExists(correo);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Error en el servidor' });
