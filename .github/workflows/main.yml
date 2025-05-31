@@ -109,6 +109,9 @@ jobs:
           # This command ensures the image is updated with the new tag
           sed -i "s|image: gcr.io/<YOUR_PROJECT_ID>/healthcare-backend:latest|image: ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}|g" kubernetes/deployment.yaml
 
+          # Scale Deployment a 0 réplicas
+          kubectl scale deployment node-backend-deployment --replicas=0 -n default
+
           # Apply the Kubernetes manifests
           kubectl apply -f kubernetes/deployment.yaml
           kubectl apply -f kubernetes/service.yaml
