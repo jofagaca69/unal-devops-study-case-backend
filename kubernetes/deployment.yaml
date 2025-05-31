@@ -14,6 +14,7 @@ spec:
       labels:
         app: node-backend
     spec:
+      serviceAccountName: cloudsql-sa
       containers:
         - name: node-backend-container
           image: gcr.io/<YOUR_PROJECT_ID>/healthcare-backend:latest
@@ -22,6 +23,25 @@ spec:
           env:
             - name: PORT
               value: "8080"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: name
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_HOST
+              value: "127.0.0.1"
           resources:
             requests:
               cpu: "250m"
@@ -41,3 +61,11 @@ spec:
               port: 8080
             initialDelaySeconds: 15
             periodSeconds: 20
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.33.0
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances=cbse-2024ii-438216:us-central1:postgres-sql=tcp:5432" # ¡Reemplaza con los valores de tu instancia SQL!
+            - "-ip_address_types=PRIVATE"
+          securityContext:
+            runAsNonRoot: true
