@@ -1,5 +1,5 @@
 import express from "express";
-import { login } from "./services/authService.js";
+import { login, register } from "./services/authService.js";
 
 const app = express();
 const port = process.env.PORT || 8080; // Use process.env.PORT for containerized apps
