@@ -10,8 +10,8 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # Your GCP Project ID
-  GKE_CLUSTER_NAME: cluster-2
-  GKE_CLUSTER_ZONE: us-central1
+  GKE_CLUSTER_NAME: cluster-1
+  GKE_CLUSTER_ZONE: us-central1-a
   REPOSITORY_NAME: healthcare-backend
   IMAGE_NAME: auth-api
   # Use the commit SHA as the image tag for unique versions
@@ -19,7 +19,6 @@ env:
   GCR_HOSTNAME: us-central1-docker.pkg.dev
 
 jobs:
-
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -58,7 +57,6 @@ jobs:
       - name: Run tests
         run: npm test -- --watch=false --browsers=ChromeHeadless
         working-directory: ./app
-
 
   build-and-deploy:
     runs-on: ubuntu-latest
