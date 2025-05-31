@@ -110,7 +110,7 @@ jobs:
           sed -i "s|image: gcr.io/<YOUR_PROJECT_ID>/healthcare-backend:latest|image: ${GCR_HOSTNAME}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}|g" kubernetes/deployment.yaml
 
           # Scale Deployment a 0 replicas
-          kubectl scale deployment node-backend-deployment --replicas=0 -n default
+          kubectl scale deployment node-backend-deployment --replicas=0 -n default --ignore-not-found
 
           # Apply the Kubernetes manifests
           kubectl apply -f kubernetes/deployment.yaml
