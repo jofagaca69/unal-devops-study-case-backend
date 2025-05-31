@@ -112,7 +112,9 @@ export const register = async ({
     const checkEmailResult = await client.query(checkEmailQuery, [email]);
 
     if (checkEmailResult.rows.length > 0) {
-      throw new Error("Cuenta ya existente con este correo electrónico.");
+      throw new Error(
+        "Cuenta ya existente con este correo electrónico proporcionado."
+      );
     }
 
     const saltRounds = 10;
