@@ -65,7 +65,7 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.33.0
           command:
             - "/cloud_sql_proxy"
-            - "-instances=cbse-2024ii-438216:us-central1:postgres-sql=tcp:5432" # ¡Reemplaza con los valores de tu instancia SQL!
+            - "-instances=unal-devops:us-central1:postgres-sql=tcp:5432" # ¡Reemplaza con los valores de tu instancia SQL!
             - "-ip_address_types=PRIVATE"
           securityContext:
             runAsNonRoot: true
