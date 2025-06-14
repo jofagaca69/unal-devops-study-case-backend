@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register } from "./services/authService.js";
+import { login, register, checkUser } from "./services/authService.js";
 
 const app = express();
 const port = process.env.PORT || 8080; // Use process.env.PORT for containerized apps
@@ -63,6 +63,33 @@ app.post("/register", async (req, res) => {
         .status(500)
         .json({ error: "Error interno del servidor al intentar registrar." });
     }
+  }
+});
+
+app.post("/checkUser", async (req, res) => {
+  try {
+    const email = req.body?.email || req.headers['x-user-email'];
+    
+    if (!email) {
+      return res.status(400).json({ 
+        success: false,
+        error: "El email es requerido" 
+      });
+    }
+
+    const result = await checkUser(email);
+    res.status(200).json({
+      success: true,
+      exists: result.exists,
+      userId: result.userId
+    });
+  } catch (error) {
+    console.error("Error al verificar usuario:", error);
+    res.status(500).json({ 
+      success: false,
+      error: "Error interno del servidor al verificar usuario",
+      message: error.message 
+    });
   }
 });
 
