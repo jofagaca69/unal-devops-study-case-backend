@@ -6,7 +6,7 @@ const ACCOUNT_LOCK_TIME_MINUTES = 5;
 
 export const login = async (correo, password) => {
   const client = await pool.connect();
-  ////////
+  /////////
   try {
     const authQuery = "SELECT * FROM auth WHERE username = $1";
     const authResult = await client.query(authQuery, [correo]);
