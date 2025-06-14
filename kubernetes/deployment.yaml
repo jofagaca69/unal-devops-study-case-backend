@@ -14,7 +14,11 @@ spec:
       labels:
         app: node-backend
     spec:
-      serviceAccountName: cloudsql-sa
+      # vserviceAccountName: cloudsql-sa
+      volumes:
+        - name: cloudsql-key-volume
+          secret:
+            secretName: cloudsql-sa-key
       containers:
         - name: node-backend-container
           image: gcr.io/<YOUR_PROJECT_ID>/healthcare-backend:latest
@@ -65,7 +69,9 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.33.0
           command:
             - "/cloud_sql_proxy"
-            - "-instances=unal-devops:us-central1:postgres-sql=tcp:5432" # ¡Reemplaza con los valores de tu instancia SQL!
-            - "-ip_address_types=PRIVATE"
-          securityContext:
-            runAsNonRoot: true
+            - "-instances=unal-devops:us-central1:postgres-sql=tcp:5432"
+            - "-credential_file=/etc/cloudsql-key/credentials.json"
+          volumeMounts:
+            - name: cloudsql-key-volume
+              mountPath: /etc/cloudsql-key
+              readOnly: true
