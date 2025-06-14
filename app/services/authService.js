@@ -154,3 +154,25 @@ export const register = async ({
     client.release();
   }
 };
+
+export const checkUser = async (email) => {
+  const client = await pool.connect();
+  try {
+    if (!email) {
+      throw new Error("El email es requerido");
+    }
+
+    const checkQuery = "SELECT id FROM users WHERE email = $1";
+    const result = await client.query(checkQuery, [email]);
+    
+    return {
+      exists: result.rows.length > 0,
+      userId: result.rows.length > 0 ? result.rows[0].id : null
+    };
+  } catch (error) {
+    console.error("Error al verificar usuario:", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
