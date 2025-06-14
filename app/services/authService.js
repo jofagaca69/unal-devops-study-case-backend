@@ -124,7 +124,13 @@ export const register = async ({
       INSERT INTO users (email, first_name, last_name, phone, birth_date)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id;
+    `
+
+    const insertAuthQuery = `
+      INSERT INTO auth (user_id, username, password)
+      VALUES ($1, $2, $3);
     `;
+
     const userResult = await client.query(insertUserQuery, [
       email,
       first_name,
@@ -132,23 +138,18 @@ export const register = async ({
       phone,
       birth_date,
     ]);
+
     const userId = userResult.rows[0].id;
 
-    const insertAuthQuery = `
-      INSERT INTO auth (user_id, username, password)
-      VALUES ($1, $2, $3);
-    `;
-    await client.query(insertAuthQuery, [userId, email, hashedPassword]);
+    await client.query(insertAuthQuery, [userId, email, password]);
 
     await client.query("COMMIT");
-    return { success: true, message: "Registro exitoso", userId };
+
+    return { success: true, userId };
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Error en registro:", error);
-    if (error.message === "Cuenta ya existente con este correo electrónico.") {
-      throw error;
-    }
-    throw new Error("Error al registrar usuario");
+    throw error;
   } finally {
     client.release();
   }
