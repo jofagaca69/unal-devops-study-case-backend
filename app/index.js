@@ -17,8 +17,8 @@ app.get("/health", (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const { correo, password } = req.body;
-    const result = await login(correo, password);
+    const { email, password } = req.body;
+    const result = await login(email, password);
     if (result.success) {
       res.status(200).json(result);
     } else {
