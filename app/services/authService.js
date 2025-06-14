@@ -6,7 +6,7 @@ const ACCOUNT_LOCK_TIME_MINUTES = 5;
 
 export const login = async (correo, password) => {
   const client = await pool.connect();
-  //////////
+  ///////////
   try {
     const authQuery = "SELECT * FROM auth WHERE username = $1";
     const authResult = await client.query(authQuery, [correo]);
@@ -164,10 +164,10 @@ export const checkUser = async (email) => {
 
     const checkQuery = "SELECT id FROM users WHERE email = $1";
     const result = await client.query(checkQuery, [email]);
-    
+
     return {
       exists: result.rows.length > 0,
-      userId: result.rows.length > 0 ? result.rows[0].id : null
+      userId: result.rows.length > 0 ? result.rows[0].id : null,
     };
   } catch (error) {
     console.error("Error al verificar usuario:", error);
